@@ -22,8 +22,9 @@ func ExampleApp_Run() {
 	app.Flags = []Flag{
 		StringFlag{Name: "name", Value: "bob", Usage: "a name to say"},
 	}
-	app.Action = func(c *Context) {
+	app.Action = func(c *Context) error {
 		fmt.Printf("Hello %v\n", c.String("name"))
+		return nil
 	}
 	app.UsageText = "app [first_arg] [second_arg]"
 	app.Author = "Harrison"
@@ -58,8 +59,9 @@ func ExampleApp_Run_subcommand() {
 							Usage: "Name of the person to greet",
 						},
 					},
-					Action: func(c *Context) {
+					Action: func(c *Context) error {
 						fmt.Println("Hello,", c.String("name"))
+						return nil
 					},
 				},
 			},
@@ -86,8 +88,9 @@ func ExampleApp_Run_help() {
 			Aliases:     []string{"d"},
 			Usage:       "use it to see a description",
 			Description: "This is how we describe describeit the function",
-			Action: func(c *Context) {
+			Action: func(c *Context) error {
 				fmt.Printf("i like to describe things")
+				return nil
 			},
 		},
 	}
@@ -116,15 +119,17 @@ func ExampleApp_Run_bashComplete() {
 			Aliases:     []string{"d"},
 			Usage:       "use it to see a description",
 			Description: "This is how we describe describeit the function",
-			Action: func(c *Context) {
+			Action: func(c *Context) error {
 				fmt.Printf("i like to describe things")
+				return nil
 			},
 		}, {
 			Name:        "next",
 			Usage:       "next example",
 			Description: "more stuff to see when generating bash completion",
-			Action: func(c *Context) {
+			Action: func(c *Context) error {
 				fmt.Printf("the next example")
+				return nil
 			},
 		},
 	}
@@ -142,8 +147,9 @@ func TestApp_Run(t *testing.T) {
 	s := ""
 
 	app := NewApp()
-	app.Action = func(c *Context) {
+	app.Action = func(c *Context) error {
 		s = s + c.Args().First()
+		return nil
 	}
 
 	err := app.Run([]string{"command", "foo"})
@@ -188,9 +194,10 @@ func TestApp_CommandWithArgBeforeFlags(t *testing.T) {
 		Flags: []Flag{
 			StringFlag{Name: "option", Value: "", Usage: "some option"},
 		},
-		Action: func(c *Context) {
+		Action: func(c *Context) error {
 			parsedOption = c.String("option")
 			firstArg = c.Args().First()
+			return nil
 		},
 	}
 	app.Commands = []Command{command}
@@ -208,8 +215,9 @@ func TestApp_RunAsSubcommandParseFlags(t *testing.T) {
 	a.Commands = []Command{
 		{
 			Name: "foo",
-			Action: func(c *Context) {
+			Action: func(c *Context) error {
 				context = c
+				return nil
 			},
 			Flags: []Flag{
 				StringFlag{
@@ -237,9 +245,10 @@ func TestApp_CommandWithFlagBeforeTerminator(t *testing.T) {
 		Flags: []Flag{
 			StringFlag{Name: "option", Value: "", Usage: "some option"},
 		},
-		Action: func(c *Context) {
+		Action: func(c *Context) error {
 			parsedOption = c.String("option")
 			args = c.Args()
+			return nil
 		},
 	}
 	app.Commands = []Command{command}
@@ -258,8 +267,9 @@ func TestApp_CommandWithDash(t *testing.T) {
 	app := NewApp()
 	command := Command{
 		Name: "cmd",
-		Action: func(c *Context) {
+		Action: func(c *Context) error {
 			args = c.Args()
+			return nil
 		},
 	}
 	app.Commands = []Command{command}
@@ -276,8 +286,9 @@ func TestApp_CommandWithNoFlagBeforeTerminator(t *testing.T) {
 	app := NewApp()
 	command := Command{
 		Name: "cmd",
-		Action: func(c *Context) {
+		Action: func(c *Context) error {
 			args = c.Args()
+			return nil
 		},
 	}
 	app.Commands = []Command{command}
@@ -296,8 +307,9 @@ func TestApp_Float64Flag(t *testing.T) {
 	app.Flags = []Flag{
 		Float64Flag{Name: "height", Value: 1.5, Usage: "Set the height, in meters"},
 	}
-	app.Action = func(c *Context) {
+	app.Action = func(c *Context) error {
 		meters = c.Float64("height")
+		return nil
 	}
 
 	app.Run([]string{"", "--height", "1.93"})
@@ -316,11 +328,12 @@ func TestApp_ParseSliceFlags(t *testing.T) {
 			IntSliceFlag{Name: "p", Value: &IntSlice{}, Usage: "set one or more ip addr"},
 			StringSliceFlag{Name: "ip", Value: &StringSlice{}, Usage: "set one or more ports to open"},
 		},
-		Action: func(c *Context) {
+		Action: func(c *Context) error {
 			parsedIntSlice = c.IntSlice("p")
 			parsedStringSlice = c.StringSlice("ip")
 			parsedOption = c.String("option")
 			firstArg = c.Args().First()
+			return nil
 		},
 	}
 	app.Commands = []Command{command}
@@ -373,9 +386,10 @@ func TestApp_ParseSliceFlagsWithMissingValue(t *testing.T) {
 			IntSliceFlag{Name: "a", Usage: "set numbers"},
 			StringSliceFlag{Name: "str", Usage: "set strings"},
 		},
-		Action: func(c *Context) {
+		Action: func(c *Context) error {
 			parsedIntSlice = c.IntSlice("a")
 			parsedStringSlice = c.StringSlice("str")
+			return nil
 		},
 	}
 	app.Commands = []Command{command}
@@ -458,8 +472,9 @@ func TestApp_BeforeFunc(t *testing.T) {
 	app.Commands = []Command{
 		Command{
 			Name: "sub",
-			Action: func(c *Context) {
+			Action: func(c *Context) error {
 				subcommandRun = true
+				return nil
 			},
 		},
 	}
@@ -524,8 +539,9 @@ func TestApp_AfterFunc(t *testing.T) {
 	app.Commands = []Command{
 		Command{
 			Name: "sub",
-			Action: func(c *Context) {
+			Action: func(c *Context) error {
 				subcommandRun = true
+				return nil
 			},
 		},
 	}
@@ -636,8 +652,9 @@ func TestAppCommandNotFound(t *testing.T) {
 	app.Commands = []Command{
 		Command{
 			Name: "bar",
-			Action: func(c *Context) {
+			Action: func(c *Context) error {
 				subcommandRun = true
+				return nil
 			},
 		},
 	}
@@ -655,9 +672,10 @@ func TestGlobalFlag(t *testing.T) {
 	app.Flags = []Flag{
 		StringFlag{Name: "global, g", Usage: "global"},
 	}
-	app.Action = func(c *Context) {
+	app.Action = func(c *Context) error {
 		globalFlag = c.GlobalString("global")
 		globalFlagSet = c.GlobalIsSet("global")
+		return nil
 	}
 	app.Run([]string{"command", "-g", "foo"})
 	expect(t, globalFlag, "foo")
@@ -683,13 +701,14 @@ func TestGlobalFlagsInSubcommands(t *testing.T) {
 			Subcommands: []Command{
 				{
 					Name: "bar",
-					Action: func(c *Context) {
+					Action: func(c *Context) error {
 						if c.GlobalBool("debug") {
 							subcommandRun = true
 						}
 						if c.GlobalBool("parent") {
 							parentFlag = true
 						}
+						return nil
 					},
 				},
 			},
@@ -891,8 +910,9 @@ func TestApp_Run_Help(t *testing.T) {
 		app.Name = "boom"
 		app.Usage = "make an explosive entrance"
 		app.Writer = buf
-		app.Action = func(c *Context) {
+		app.Action = func(c *Context) error {
 			buf.WriteString("boom I say!")
+			return nil
 		}
 
 		err := app.Run(args)
@@ -922,8 +942,9 @@ func TestApp_Run_Version(t *testing.T) {
 		app.Usage = "make an explosive entrance"
 		app.Version = "0.1.0"
 		app.Writer = buf
-		app.Action = func(c *Context) {
+		app.Action = func(c *Context) error {
 			buf.WriteString("boom I say!")
+			return nil
 		}
 
 		err := app.Run(args)
@@ -991,7 +1012,7 @@ func TestApp_Run_Categories(t *testing.T) {
 
 func TestApp_Run_DoesNotOverwriteErrorFromBefore(t *testing.T) {
 	app := NewApp()
-	app.Action = func(c *Context) {}
+	app.Action = func(c *Context) error { return nil }
 	app.Before = func(c *Context) error { return fmt.Errorf("before error") }
 	app.After = func(c *Context) error { return fmt.Errorf("after error") }
 

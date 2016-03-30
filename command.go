@@ -34,7 +34,7 @@ type Command struct {
 	// It is run even if Action() panics
 	After func(context *Context) error
 	// The function to call when this command is invoked
-	Action func(context *Context)
+	Action Action
 	// Execute this function, if an usage error occurs. This is useful for displaying customized usage error messages.
 	// This function is able to replace the original error messages.
 	// If this function is not set, the "Incorrect usage" is displayed and the execution is interrupted.
@@ -176,8 +176,7 @@ func (c Command) Run(ctx *Context) (err error) {
 	}
 
 	context.Command = c
-	c.Action(context)
-	return nil
+	return c.Action(context)
 }
 
 func (c Command) Names() []string {

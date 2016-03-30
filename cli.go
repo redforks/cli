@@ -38,3 +38,6 @@ func (m MultiError) Error() string {
 
 	return strings.Join(errs, "\n")
 }
+
+// Action is function type of Command.Action & App.Action
+type Action func(context *Context) error

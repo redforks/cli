@@ -46,7 +46,7 @@ type App struct {
 	// It is run even if Action() panics
 	After func(context *Context) error
 	// The action to execute when no subcommands are specified
-	Action func(context *Context)
+	Action Action
 	// Execute this function if the proper command cannot be found
 	CommandNotFound func(context *Context, command string)
 	// Execute this function, if an usage error occurs. This is useful for displaying customized usage error messages.
@@ -198,8 +198,7 @@ func (a *App) Run(arguments []string) (err error) {
 	}
 
 	// Run default Action
-	a.Action(context)
-	return nil
+	return a.Action(context)
 }
 
 // Another entry point to the cli app, takes care of passing arguments and error handling
@@ -309,9 +308,7 @@ func (a *App) RunAsSubcommand(ctx *Context) (err error) {
 	}
 
 	// Run default Action
-	a.Action(context)
-
-	return nil
+	return a.Action(context)
 }
 
 // Returns the named command on App. Returns nil if the command does not exist
